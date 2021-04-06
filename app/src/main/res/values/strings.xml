@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">running</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_no_account"><u>Don\'t have an account ? Sign up now</u></string>
+    <string name="login_title">Login</string>
+    <string name="login_btn_login">Login</string>
+    <string name="register_first_name">First name</string>
+    <string name="register_last_name">Last name</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_have_an_account"><u>You have an account ? Sign in now</u></string>
+    <string name="register_title">Register</string>
+    <string name="register_btn_register">Register</string>
 </resources>

@@ -1,10 +1,9 @@
-package com.raftls.running.ui.activities;
+package com.raftls.running.app.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.raftls.running.R;
 import com.raftls.running.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {

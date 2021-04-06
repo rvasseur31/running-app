@@ -1,6 +1,6 @@
 package com.raftls.running.network;
 
-import com.raftls.running.commons.Constants;
+import com.raftls.running.app.Constants;
 import com.raftls.running.network.interfaces.ApiInterface;
 
 import java.util.concurrent.TimeUnit;
@@ -18,7 +18,7 @@ public class ApiClient {
 
     public static Retrofit getClient() {
         if (okHttpClient == null)
-            initOkHttp();
+            initOkHttp(null);
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -30,7 +30,7 @@ public class ApiClient {
         return retrofit;
     }
 
-    private static void initOkHttp() {
+    public static void initOkHttp(String token) {
         OkHttpClient.Builder httpClient = new OkHttpClient().newBuilder()
                 .connectTimeout(REQUEST_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(REQUEST_TIMEOUT, TimeUnit.SECONDS)
@@ -44,6 +44,9 @@ public class ApiClient {
             Request.Builder requestBuilder = original.newBuilder()
                     .addHeader("Accept", "application/json")
                     .addHeader("Content-Type", "application/json");
+            if (token != null) {
+                requestBuilder.addHeader("x-access-token", token);
+            }
 
             Request request = requestBuilder.build();
             return chain.proceed(request);
