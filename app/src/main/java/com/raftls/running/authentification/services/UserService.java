@@ -67,6 +67,7 @@ public class UserService {
                 if (response.isSuccessful() && response.body() != null) {
                     saveUserPreference(context, response.body().getToken());
                     RunningApp.getInstance().setCurrentUser(response.body());
+                    EventBus.getDefault().post(new AuthenticationEvent(response.body()));
                 } else {
                     ResponseError responseError = new Gson().fromJson(response.errorBody().charStream(), ResponseError.class);
                 }
@@ -87,6 +88,7 @@ public class UserService {
                 if (response.isSuccessful() && response.body() != null) {
                     saveUserPreference(context, response.body().getToken());
                     RunningApp.getInstance().setCurrentUser(response.body());
+                    EventBus.getDefault().post(new AuthenticationEvent(response.body()));
                 } else {
                     ResponseError responseError = new Gson().fromJson(response.errorBody().charStream(), ResponseError.class);
                 }
