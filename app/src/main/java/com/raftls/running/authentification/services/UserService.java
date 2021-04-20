@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.raftls.running.RunningApp;
+import com.raftls.running.app.RunningApp;
 import com.raftls.running.authentification.events.AuthenticationEvent;
 import com.raftls.running.authentification.models.User;
 import com.raftls.running.authentification.models.UserLogin;

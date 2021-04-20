@@ -1,5 +1,8 @@
 plugins {
     id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -63,6 +66,10 @@ dependencies {
 
     // Permissions
     implementation 'pub.devrel:easypermissions:3.0.0'
+
+    // Hilt for DI
+    implementation "com.google.dagger:hilt-android:2.33-beta"
+    kapt "com.google.dagger:hilt-compiler:2.33-beta"
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

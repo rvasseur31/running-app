@@ -1,9 +1,12 @@
-package com.raftls.running;
+package com.raftls.running.app;
 
 import android.app.Application;
 
 import com.raftls.running.authentification.models.User;
 
+import dagger.hilt.android.HiltAndroidApp;
+
+@HiltAndroidApp
 public class RunningApp extends Application {
 
     private User currentUser;
