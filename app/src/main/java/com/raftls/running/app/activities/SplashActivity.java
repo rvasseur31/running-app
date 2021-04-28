@@ -1,6 +1,5 @@
 package com.raftls.running.app.activities;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.raftls.running.R;
@@ -10,9 +9,6 @@ import com.raftls.running.authentification.services.UserService;
 import com.raftls.running.storage.services.StorageService;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 public class SplashActivity extends BaseAuthenticationActivity {
 
@@ -29,17 +25,11 @@ public class SplashActivity extends BaseAuthenticationActivity {
     }
 
     private void isAuthenticated() {
-        try {
-            SharedPreferences preferences = StorageService.getInstance().getEncryptedPreferences(
-                    getApplicationContext(), UserService.AUTH_PREFERENCES);
-            String token = preferences.getString(UserService.TOKEN_PREFERENCE, null);
-            if (token != null) {
-                UserService.getInstance().me(token);
-            } else {
-                EventBus.getDefault().post(new AuthenticationEvent(null));
-            }
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+        String token = StorageService.getInstance().getStringPreference(
+                getApplicationContext(), UserService.AUTH_PREFERENCES, UserService.TOKEN_PREFERENCE);
+        if (token != null) {
+            UserService.getInstance().me(getApplicationContext(), token);
+        } else {
             EventBus.getDefault().post(new AuthenticationEvent(null));
         }
     }

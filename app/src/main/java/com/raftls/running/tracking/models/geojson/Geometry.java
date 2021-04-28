@@ -1,6 +1,9 @@
 package com.raftls.running.tracking.models.geojson;
 
+import android.location.Location;
+
 import androidx.annotation.FloatRange;
+import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -22,10 +25,10 @@ public class Geometry {
 
     @SerializedName("type")
     @Expose
-    private String type;
+    protected String type;
     @SerializedName("coordinates")
     @Expose
-    private List<List<Double>> coordinates;
+    protected List<List<Double>> coordinates;
 
     public Geometry() {
         this.type = TYPE;
@@ -73,5 +76,17 @@ public class Geometry {
                             @FloatRange(from = MIN_LATITUDE, to = MAX_LATITUDE) double latitude,
                             double altitude) {
         coordinates.add(pointToCoordinates(longitude, latitude, altitude));
+    }
+
+    @Nullable
+    public Location getLastPosition() {
+        Location location = new Location("");//provider name is unnecessary
+        if (coordinates.isEmpty()) {
+            return null;
+        }
+        List<Double> lastPosition = coordinates.get(coordinates.size() - 1);
+        location.setLongitude(lastPosition.get(0));
+        location.setLatitude(lastPosition.get(1));
+        return location;
     }
 }

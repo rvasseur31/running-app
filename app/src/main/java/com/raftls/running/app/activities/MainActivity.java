@@ -1,13 +1,15 @@
 package com.raftls.running.app.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.os.Bundle;
 
-import com.raftls.running.databinding.ActivityMainBinding;
-import com.raftls.running.tracking.services.TrackingService;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
-import java.util.TreeMap;
+import com.raftls.running.R;
+import com.raftls.running.databinding.ActivityMainBinding;
+import com.raftls.running.tracking.ui.TrackingActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,11 +20,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+            if (R.id.home_history == item.getItemId()) {
+                openFragment(new Fragment());
+                return true;
+            } else if (R.id.home_record == item.getItemId()) {
+                Intent intent = new Intent(getApplicationContext(), TrackingActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
+    }
 
-        for (int index = 0; index < 10; index++) {
-            TrackingService.getInstance().addPosition(1 + 0.1 * index, 4 + 0.1 * index, 10 * index);
-        }
+    private void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main_fragment, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 
-        TrackingService.getInstance().sendRun();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

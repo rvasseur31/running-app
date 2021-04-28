@@ -17,8 +17,9 @@ public class ApiClient {
     private static OkHttpClient okHttpClient;
 
     public static Retrofit getClient() {
-        if (okHttpClient == null)
+        if (okHttpClient == null) {
             initOkHttp(null);
+        }
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -45,7 +46,7 @@ public class ApiClient {
                     .addHeader("Accept", "application/json")
                     .addHeader("Content-Type", "application/json");
             if (token != null) {
-                requestBuilder.addHeader("x-access-token", token);
+                requestBuilder.addHeader("Cookie", token);
             }
 
             Request request = requestBuilder.build();

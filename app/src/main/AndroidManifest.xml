@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.raftls.running">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,8 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Running"
         android:usesCleartextTraffic="true"
-        tools:targetApi="m">
-
+        tools:targetApi="m"
+        tools:replace="android:icon">
+        <activity android:name=".tracking.ui.TrackingActivity" />
         <activity android:name=".app.activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
