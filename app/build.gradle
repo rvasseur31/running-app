@@ -10,6 +10,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.raftls.running"
         minSdkVersion 21
         targetSdkVersion 30
@@ -38,6 +39,7 @@ android {
 dependencies {
 
     // AndroidX
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.security:security-crypto:1.1.0-alpha03'

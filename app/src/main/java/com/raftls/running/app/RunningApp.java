@@ -2,12 +2,14 @@ package com.raftls.running.app;
 
 import android.app.Application;
 
+import androidx.multidex.MultiDexApplication;
+
 import com.raftls.running.authentification.models.User;
 
 import dagger.hilt.android.HiltAndroidApp;
 
 @HiltAndroidApp
-public class RunningApp extends Application {
+public class RunningApp extends MultiDexApplication {
 
     private User currentUser;
     private static RunningApp instance;
