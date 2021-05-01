@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FeatureCollection {
+public class AppFeatureCollection {
 
     private static final String TYPE = "FeatureCollection";
 
@@ -33,13 +33,13 @@ public class FeatureCollection {
         this.features = features;
     }
 
-    public FeatureCollection() {
+    public AppFeatureCollection() {
         this.type = TYPE;
         this.features = new ArrayList<>();
         features.add(new Feature());
     }
 
-    public FeatureCollection(String type, List<Feature> features) {
+    public AppFeatureCollection(String type, List<Feature> features) {
         this.type = type;
         this.features = features;
     }

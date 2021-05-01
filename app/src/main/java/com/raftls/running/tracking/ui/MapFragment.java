@@ -77,6 +77,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         }
     }
 
+    public MapboxMap getMapboxMap() {
+        if (getActivity() instanceof TrackingActivity) {
+            return mapboxMap;
+        }
+        return null;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
