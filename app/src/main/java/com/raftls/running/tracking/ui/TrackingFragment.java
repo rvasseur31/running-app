@@ -50,7 +50,6 @@ public class TrackingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.chronometer.setBase(SystemClock.elapsedRealtime() - (trackingService.getChronometer().getChronometerTime() - trackingService.getChronometer().getPauseBaseTime()));
         startChronometer(null);
     }
 
@@ -68,20 +67,26 @@ public class TrackingFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startChronometer(StartTrackingEvent event) {
+        if (trackingService.getChronometer().getPauseBaseTime() == 0L) {
+            binding.chronometer.setBase(SystemClock.elapsedRealtime() - trackingService.getChronometer().getChronometerTime());
+        } else {
+            binding.chronometer.setBase(SystemClock.elapsedRealtime() - trackingService.getTimeWhenPause());
+        }
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                showTrackingData();
+            }
+        }, 0, 10000);
         if (trackingService.trackingState == ETrackingState.RUNNING) {
             binding.chronometer.start();
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    showTrackingData();
-                }
-            }, 0, 10000);
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void stopChronometer(PauseTrackingEvent event) {
         binding.chronometer.stop();
+        trackingService.setTimeWhenPause(SystemClock.elapsedRealtime() - binding.chronometer.getBase());
         timer.cancel();
         timer.purge();
 

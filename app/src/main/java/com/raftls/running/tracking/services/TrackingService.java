@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Looper;
-import android.util.Log;
+import android.os.SystemClock;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
@@ -49,6 +49,7 @@ public class TrackingService {
     private LocationEngine locationEngine;
     private LocationEngineCallback<LocationEngineResult> locationEngineCallback;
     private float distance = 0;
+    private long timeWhenPause = 0;
     private ChronometerManager chronometer;
 
     public static TrackingService getInstance() {
@@ -81,6 +82,7 @@ public class TrackingService {
 
     public void resetTracking() {
         trackingState = ETrackingState.STOPPED;
+        chronometer.stop();
         createRun();
     }
 
@@ -164,13 +166,19 @@ public class TrackingService {
     }
 
     public float getAverageSpeed() {
-        float hours = getMillisToSeconds(getDuration());
-        return (5f / hours) * 3.6f;
+        float seconds = getMillisToSeconds(getDuration());
+        return (distance / seconds) * 3.6f;
     }
 
     private float getMillisToSeconds(long millis) {
         return millis / 1000f;
     }
 
+    public long getTimeWhenPause() {
+        return timeWhenPause;
+    }
 
+    public void setTimeWhenPause(long timeWhenPause) {
+        this.timeWhenPause = timeWhenPause;
+    }
 }
