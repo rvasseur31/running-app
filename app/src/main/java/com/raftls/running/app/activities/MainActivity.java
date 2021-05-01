@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.raftls.running.R;
 import com.raftls.running.databinding.ActivityMainBinding;
+import com.raftls.running.history.ui.HistoryFragment;
 import com.raftls.running.tracking.ui.TrackingActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             if (R.id.home_history == item.getItemId()) {
-                openFragment(new Fragment());
+                openFragment(new HistoryFragment());
                 return true;
             } else if (R.id.home_record == item.getItemId()) {
                 Intent intent = new Intent(getApplicationContext(), TrackingActivity.class);
@@ -38,10 +39,5 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.main_fragment, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }
