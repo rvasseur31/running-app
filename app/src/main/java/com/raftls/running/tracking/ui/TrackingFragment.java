@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.raftls.running.app.Utils;
 import com.raftls.running.databinding.FragmentTrackingBinding;
 import com.raftls.running.tracking.events.StartTrackingEvent;
 import com.raftls.running.tracking.events.PauseTrackingEvent;
@@ -49,7 +50,6 @@ public class TrackingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.chronometer.setBase(SystemClock.elapsedRealtime() - (trackingService.getChronometer().getChronometerTime() - trackingService.getChronometer().getPauseBaseTime()));
         startChronometer(null);
     }
 
@@ -67,20 +67,26 @@ public class TrackingFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startChronometer(StartTrackingEvent event) {
+        if (trackingService.getChronometer().getPauseBaseTime() == 0L) {
+            binding.chronometer.setBase(SystemClock.elapsedRealtime() - trackingService.getChronometer().getChronometerTime());
+        } else {
+            binding.chronometer.setBase(SystemClock.elapsedRealtime() - trackingService.getTimeWhenPause());
+        }
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                showTrackingData();
+            }
+        }, 0, 10000);
         if (trackingService.trackingState == ETrackingState.RUNNING) {
             binding.chronometer.start();
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    showTrackingData();
-                }
-            }, 0, 10000);
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void stopChronometer(PauseTrackingEvent event) {
         binding.chronometer.stop();
+        trackingService.setTimeWhenPause(SystemClock.elapsedRealtime() - binding.chronometer.getBase());
         timer.cancel();
         timer.purge();
 
@@ -88,10 +94,10 @@ public class TrackingFragment extends Fragment {
 
     private void showTrackingData() {
         if (getActivity() != null) {
-            //
+            // Must use the uiThread
             getActivity().runOnUiThread(() -> {
-                binding.tvDistance.setText(String.valueOf(trackingService.getDistance()));
-                binding.tvAverageSpeed.setText(String.valueOf(trackingService.getAverageSpeed()));
+                binding.tvDistance.setText(String.valueOf(Utils.round(trackingService.getDistance() / 1000, 1)));
+                binding.tvAverageSpeed.setText(String.valueOf(Utils.round(trackingService.getAverageSpeed(), 2)));
             });
         }
     }
