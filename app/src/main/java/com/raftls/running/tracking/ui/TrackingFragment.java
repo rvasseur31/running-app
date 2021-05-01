@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.raftls.running.app.Utils;
 import com.raftls.running.databinding.FragmentTrackingBinding;
 import com.raftls.running.tracking.events.StartTrackingEvent;
 import com.raftls.running.tracking.events.PauseTrackingEvent;
@@ -88,10 +89,10 @@ public class TrackingFragment extends Fragment {
 
     private void showTrackingData() {
         if (getActivity() != null) {
-            //
+            // Must use the uiThread
             getActivity().runOnUiThread(() -> {
-                binding.tvDistance.setText(String.valueOf(trackingService.getDistance()));
-                binding.tvAverageSpeed.setText(String.valueOf(trackingService.getAverageSpeed()));
+                binding.tvDistance.setText(String.valueOf(Utils.round(trackingService.getDistance() / 1000, 1)));
+                binding.tvAverageSpeed.setText(String.valueOf(Utils.round(trackingService.getAverageSpeed(), 2)));
             });
         }
     }
