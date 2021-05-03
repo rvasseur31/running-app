@@ -1,12 +1,17 @@
 package com.raftls.running.history.adapters;
 
 import android.content.Context;
+import android.location.Location;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.raftls.running.R;
 import com.raftls.running.app.utils.DateUtils;
 import com.raftls.running.history.adapters.viewHolders.HistoryViewHolder;
+import com.raftls.running.map.MapUtils;
 import com.raftls.running.tracking.models.geojson.Run;
 
 import java.util.List;
@@ -46,7 +51,7 @@ public class HistoryItem extends AbstractFlexibleItem<HistoryViewHolder> {
 
     @Override
     public HistoryViewHolder createViewHolder(View view, FlexibleAdapter<IFlexible> adapter) {
-        return new HistoryViewHolder(view, adapter);
+        return new HistoryViewHolder(view, adapter, run);
     }
 
     @Override

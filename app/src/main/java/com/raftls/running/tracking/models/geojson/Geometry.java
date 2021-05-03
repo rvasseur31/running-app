@@ -1,6 +1,7 @@
 package com.raftls.running.tracking.models.geojson;
 
 import android.location.Location;
+import android.util.Log;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.Nullable;
@@ -88,8 +89,20 @@ public class Geometry {
             return null;
         }
         List<Double> lastPosition = coordinates.get(coordinates.size() - 1);
-        location.setLongitude(lastPosition.get(0));
-        location.setLatitude(lastPosition.get(1));
+        location.setLongitude(lastPosition.get(LONGITUDE));
+        location.setLatitude(lastPosition.get(LATITUDE));
+        return location;
+    }
+
+    public Location getFirstPosition() {
+        Location location = new Location("");//provider name is unnecessary
+        if (coordinates.isEmpty()) {
+            return null;
+        }
+        int FIRST_COORDINATE = 0;
+        List<Double> lastPosition = coordinates.get(FIRST_COORDINATE);
+        location.setLongitude(lastPosition.get(LONGITUDE));
+        location.setLatitude(lastPosition.get(LATITUDE));
         return location;
     }
 
@@ -100,8 +113,15 @@ public class Geometry {
             if (lastPoint == null) {
                 break;
             }
-            elevationGain += lastPoint.get(ALTITUDE) - point.get(ALTITUDE);
-            lastPoint = point;
+            try {
+                double elevation = lastPoint.get(ALTITUDE) - point.get(ALTITUDE);
+                if (elevation < 0) {
+                    elevationGain += elevation;
+                }
+                lastPoint = point;
+            } catch (Exception exception) {
+                Log.e("", "No altitude");
+            }
         }
         return -elevationGain;
     }
