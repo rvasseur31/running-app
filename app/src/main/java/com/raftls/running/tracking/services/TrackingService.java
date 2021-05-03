@@ -5,24 +5,24 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Looper;
-import android.util.Log;
+import android.os.SystemClock;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-import com.google.gson.Gson;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.raftls.running.map.MapUtils;
 import com.raftls.running.tracking.events.PauseTrackingEvent;
 import com.raftls.running.tracking.events.StartTrackingEvent;
 import com.raftls.running.tracking.models.ETrackingState;
-import com.raftls.running.tracking.models.geojson.FeatureCollection;
+import com.raftls.running.tracking.models.geojson.AppFeatureCollection;
 import com.raftls.running.tracking.models.geojson.Run;
 
 import org.greenrobot.eventbus.EventBus;
@@ -44,11 +44,12 @@ public class TrackingService {
 
     public ETrackingState trackingState = ETrackingState.STOPPED;
     private static TrackingService instance;
-    private FeatureCollection currentRun;
+    private AppFeatureCollection currentRun;
 
     private LocationEngine locationEngine;
     private LocationEngineCallback<LocationEngineResult> locationEngineCallback;
     private float distance = 0;
+    private long timeWhenPause = 0;
     private ChronometerManager chronometer;
 
     public static TrackingService getInstance() {
@@ -81,6 +82,7 @@ public class TrackingService {
 
     public void resetTracking() {
         trackingState = ETrackingState.STOPPED;
+        chronometer.stop();
         createRun();
     }
 
@@ -107,7 +109,7 @@ public class TrackingService {
                 }
                 if (lastSavedLocation != null) {
                     float distanceWithLastSavedLocation = lastSavedLocation.distanceTo(location);
-                    if (distanceWithLastSavedLocation < 5) {
+                    if (distanceWithLastSavedLocation < 2) {
                         return;
                     } else {
                         distance += distanceWithLastSavedLocation;
@@ -117,6 +119,7 @@ public class TrackingService {
                 addPosition(location.getLongitude(), location.getLatitude(), location.getAltitude());
                 if (mapboxMap != null && result.getLastLocation() != null) {
                     mapboxMap.getLocationComponent().forceLocationUpdate(result.getLastLocation());
+                    MapUtils.drawLines(mapboxMap, currentRun);
                 }
             }
 
@@ -144,7 +147,7 @@ public class TrackingService {
     }
 
     private void createRun() {
-        this.currentRun = new FeatureCollection();
+        this.currentRun = new AppFeatureCollection();
     }
 
     public Run getCurrentRun() {
@@ -164,13 +167,19 @@ public class TrackingService {
     }
 
     public float getAverageSpeed() {
-        float hours = getMillisToSeconds(getDuration());
-        return (5f / hours) * 3.6f;
+        float seconds = getMillisToSeconds(getDuration());
+        return (distance / seconds) * 3.6f;
     }
 
     private float getMillisToSeconds(long millis) {
         return millis / 1000f;
     }
 
+    public long getTimeWhenPause() {
+        return timeWhenPause;
+    }
 
+    public void setTimeWhenPause(long timeWhenPause) {
+        this.timeWhenPause = timeWhenPause;
+    }
 }

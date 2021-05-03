@@ -30,12 +30,14 @@ public class TrackingActivity extends AppCompatActivity {
     private ActivityTrackingBinding binding;
     private final TrackingService trackingService = TrackingService.getInstance();
     private SweetAlertDialog exitAlert;
+    private final MapFragment mapFragment = new MapFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityTrackingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        openFragment(mapFragment);
 
         binding.startTracking.setOnClickListener(view -> {
             if (trackingService.trackingState == ETrackingState.RUNNING) {
@@ -46,7 +48,7 @@ public class TrackingActivity extends AppCompatActivity {
                 binding.startTracking.setIcon(ContextCompat.getDrawable(TrackingActivity.this, R.drawable.ic_pause));
                 binding.mapViewButton.setVisibility(View.VISIBLE);
                 binding.stopTracking.setVisibility(View.VISIBLE);
-                if (!trackingService.startTracking(this, null)) {
+                if (!trackingService.startTracking(this, mapFragment.getMapboxMap())) {
                     Log.e(TAG, "No permission");
                 }
             }
@@ -87,7 +89,7 @@ public class TrackingActivity extends AppCompatActivity {
 
         binding.mapViewButton.setOnClickListener(view -> {
             if (isMapViewSelected) {
-                openFragment(new TrackingFragment());
+                showTrackingDataFragment();
             } else {
                 onBackPressed();
             }
@@ -98,13 +100,20 @@ public class TrackingActivity extends AppCompatActivity {
     private void openFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
+                .add(R.id.trackingFragment, fragment)
+                .commit();
+    }
+
+    private void showTrackingDataFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
                 .setCustomAnimations(
                         R.anim.slide_in,  // enter
                         R.anim.fade_out,  // exit
                         R.anim.fade_in,   // popEnter
                         R.anim.slide_out  // popExit
                 )
-                .add(R.id.trackingFragment, fragment)
+                .add(R.id.trackingFragment, new TrackingFragment())
                 .addToBackStack("tracking")
                 .commit();
     }

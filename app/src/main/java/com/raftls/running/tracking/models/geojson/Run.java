@@ -32,9 +32,9 @@ public class Run {
 
     @SerializedName("runData")
     @Expose
-    private FeatureCollection run;
+    private AppFeatureCollection run;
 
-    public Run(float averageSpeed, Date startingTime, long duration, float distance, FeatureCollection run) {
+    public Run(float averageSpeed, Date startingTime, long duration, float distance, AppFeatureCollection run) {
         this.maxSpeed = 23.5f;
         this.averageSpeed = averageSpeed;
         this.startingTime = startingTime;
@@ -79,11 +79,11 @@ public class Run {
         this.distance = distance;
     }
 
-    public FeatureCollection getRun() {
+    public AppFeatureCollection getRun() {
         return run;
     }
 
-    public void setRun(FeatureCollection run) {
+    public void setRun(AppFeatureCollection run) {
         this.run = run;
     }
 
