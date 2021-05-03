@@ -6,6 +6,8 @@ import com.raftls.running.authentification.models.UserMe;
 import com.raftls.running.authentification.models.UserRegister;
 import com.raftls.running.tracking.models.geojson.Run;
 
+import java.util.ArrayList;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -23,4 +25,7 @@ public interface ApiInterface {
 
     @POST("courses")
     Call<Void> uploadRun(@Body Run run);
+
+    @GET("courses/all")
+    Call<ArrayList<Run>> getAllRun();
 }

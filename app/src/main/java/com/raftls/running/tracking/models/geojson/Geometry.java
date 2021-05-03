@@ -21,6 +21,9 @@ import static com.mapbox.geojson.constants.GeoJsonConstants.MIN_LONGITUDE;
 
 public class Geometry {
 
+    private static final int LONGITUDE = 0;
+    private static final int LATITUDE = 1;
+    private static final int ALTITUDE = 2;
     private static final String TYPE = "LineString";
 
     @SerializedName("type")
@@ -57,8 +60,8 @@ public class Geometry {
     }
 
     private List<Double> pointToCoordinates(@FloatRange(from = MIN_LONGITUDE, to = MAX_LONGITUDE) double longitude,
-                               @FloatRange(from = MIN_LATITUDE, to = MAX_LATITUDE) double latitude,
-                               double altitude) {
+                                            @FloatRange(from = MIN_LATITUDE, to = MAX_LATITUDE) double latitude,
+                                            double altitude) {
         List<Double> coordinates;
         if (altitude == 0L) {
             coordinates = CoordinateShifterManager.getCoordinateShifter().shiftLonLat(longitude, latitude);
@@ -88,5 +91,18 @@ public class Geometry {
         location.setLongitude(lastPosition.get(0));
         location.setLatitude(lastPosition.get(1));
         return location;
+    }
+
+    public double getElevationGain() {
+        double elevationGain = -0;
+        List<Double> lastPoint = null;
+        for (List<Double> point : coordinates) {
+            if (lastPoint == null) {
+                break;
+            }
+            elevationGain += lastPoint.get(ALTITUDE) - point.get(ALTITUDE);
+            lastPoint = point;
+        }
+        return -elevationGain;
     }
 }
