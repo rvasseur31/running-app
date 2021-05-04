@@ -36,4 +36,7 @@
     <string name="hour">h</string>
     <string name="minut">m</string>
     <string name="second">s</string>
+    <string name="run_deleted">Run deleted</string>
+    <string name="undo">Undo</string>
+    <string name="error_run_deleted">Error while we delete the run</string>
 </resources>

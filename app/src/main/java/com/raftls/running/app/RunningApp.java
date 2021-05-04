@@ -1,7 +1,5 @@
 package com.raftls.running.app;
 
-import android.app.Application;
-
 import androidx.multidex.MultiDexApplication;
 
 import com.raftls.running.authentification.models.User;
