@@ -19,6 +19,8 @@
     <string name="distance">Distance</string>
     <string name="km_per_h">km/h</string>
     <string name="km">km</string>
+    <string name="n_km">%s km</string>
+    <string name="value_elevation_gain">%s m</string>
     <string name="stop_tracking_alert_title">Are you sure ?</string>
     <string name="stop_tracking_alert_description">Do you want to stop your tracking ? You will not able to continue this tracking.</string>
     <string name="stop_tracking_alert_confirm">Save</string>
@@ -30,4 +32,15 @@
     <string name="saving_run_channel_id">Upload run</string>
     <string name="saving_run_channel_title">@string/saving_run_channel_id</string>
     <string name="saving_run_channel_description">@string/saving_run_channel_id</string>
+    <string name="elevation_gain">Elevation gain</string>
+    <string name="hour">h</string>
+    <string name="minut">m</string>
+    <string name="second">s</string>
+    <string name="run_deleted">Run deleted</string>
+    <string name="undo">Undo</string>
+    <string name="error_run_deleted">Error while we delete the run</string>
+    <string name="max_altitude">Max altitude</string>
+    <string name="value_max_altitude">%s m</string>
+    <string name="max_speed">Max speed</string>
+    <string name="value_max_speed">%s km/h</string>
 </resources>

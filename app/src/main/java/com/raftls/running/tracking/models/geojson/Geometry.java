@@ -1,6 +1,7 @@
 package com.raftls.running.tracking.models.geojson;
 
 import android.location.Location;
+import android.util.Log;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.Nullable;
@@ -21,6 +22,9 @@ import static com.mapbox.geojson.constants.GeoJsonConstants.MIN_LONGITUDE;
 
 public class Geometry {
 
+    private static final int LONGITUDE = 0;
+    private static final int LATITUDE = 1;
+    private static final int ALTITUDE = 2;
     private static final String TYPE = "LineString";
 
     @SerializedName("type")
@@ -57,8 +61,8 @@ public class Geometry {
     }
 
     private List<Double> pointToCoordinates(@FloatRange(from = MIN_LONGITUDE, to = MAX_LONGITUDE) double longitude,
-                               @FloatRange(from = MIN_LATITUDE, to = MAX_LATITUDE) double latitude,
-                               double altitude) {
+                                            @FloatRange(from = MIN_LATITUDE, to = MAX_LATITUDE) double latitude,
+                                            double altitude) {
         List<Double> coordinates;
         if (altitude == 0L) {
             coordinates = CoordinateShifterManager.getCoordinateShifter().shiftLonLat(longitude, latitude);
@@ -85,8 +89,58 @@ public class Geometry {
             return null;
         }
         List<Double> lastPosition = coordinates.get(coordinates.size() - 1);
-        location.setLongitude(lastPosition.get(0));
-        location.setLatitude(lastPosition.get(1));
+        location.setLongitude(lastPosition.get(LONGITUDE));
+        location.setLatitude(lastPosition.get(LATITUDE));
         return location;
+    }
+
+    public Location getFirstPosition() {
+        Location location = new Location("");//provider name is unnecessary
+        if (coordinates.isEmpty()) {
+            return null;
+        }
+        int FIRST_COORDINATE = 0;
+        List<Double> lastPosition = coordinates.get(FIRST_COORDINATE);
+        location.setLongitude(lastPosition.get(LONGITUDE));
+        location.setLatitude(lastPosition.get(LATITUDE));
+        return location;
+    }
+
+    public double getElevationGain() {
+        double elevationGain = -0;
+        List<Double> lastPoint = null;
+        for (List<Double> point : coordinates) {
+            if (lastPoint != null) {
+                try {
+                    double elevation = lastPoint.get(ALTITUDE) - point.get(ALTITUDE);
+                    if (elevation < 0) {
+                        elevationGain += elevation;
+                    }
+
+                } catch (Exception exception) {
+                    Log.e("", "No altitude");
+                }
+            }
+            lastPoint = point;
+        }
+        if (elevationGain == -0) {
+            return 0;
+        }
+        return -elevationGain;
+    }
+
+    public double getMaxAltitude() {
+        double maxAltitude = 0;
+        for (List<Double> point : coordinates) {
+            try {
+                double nextAltitude = point.get(ALTITUDE);
+                if (nextAltitude > maxAltitude) {
+                    maxAltitude = nextAltitude;
+                }
+            } catch (Exception exception) {
+                Log.e("", "No altitude");
+            }
+        }
+        return maxAltitude;
     }
 }

@@ -41,6 +41,7 @@ dependencies {
     // AndroidX
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "androidx.recyclerview:recyclerview:1.2.0"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.security:security-crypto:1.1.0-alpha03'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -79,8 +80,10 @@ dependencies {
     // SweetDialog
     implementation 'com.github.f0ris.sweetalert:library:1.6.2'
 
-    // Flexible Adapter
-    implementation 'eu.davidea:flexible-adapter:5.1.0'
+    // Fast Adapter
+    implementation "com.mikepenz:fastadapter:5.4.1"
+    implementation "com.mikepenz:fastadapter-extensions-binding:5.4.1"
+    implementation "com.mikepenz:fastadapter-extensions-swipe:5.4.1"
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

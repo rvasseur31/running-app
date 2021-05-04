@@ -6,6 +6,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 
 public class Run {
+    @SerializedName("_id")
+    @Expose
+    private String id;
+
     @SerializedName("maxSpeed")
     @Expose
     private float maxSpeed;
@@ -37,6 +41,10 @@ public class Run {
         this.duration = duration;
         this.distance = distance;
         this.run = run;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public float getMaxSpeed() {
