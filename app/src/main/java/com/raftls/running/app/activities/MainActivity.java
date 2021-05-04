@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.raftls.running.R;
+import com.raftls.running.account.ui.ProfileFragment;
 import com.raftls.running.databinding.ActivityMainBinding;
 import com.raftls.running.history.ui.HistoryFragment;
 import com.raftls.running.tracking.ui.TrackingActivity;
@@ -32,6 +33,10 @@ public class MainActivity extends AppCompatActivity  {
             } else if (R.id.home_record == item.getItemId()) {
                 Intent intent = new Intent(getApplicationContext(), TrackingActivity.class);
                 startActivity(intent);
+                return true;
+            }
+            else if (R.id.home_profile == item.getItemId()) {
+                openFragment(new ProfileFragment());
                 return true;
             }
             return false;
