@@ -19,6 +19,7 @@ import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback;
 import com.raftls.running.R;
+import com.raftls.running.app.activities.MainActivity;
 import com.raftls.running.app.models.ApiResponse;
 import com.raftls.running.app.models.ResponseError;
 import com.raftls.running.databinding.FragmentHistoryBinding;
@@ -61,7 +62,9 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
 
 
                 adapter.setOnClickListener((view, historyItemIAdapter, historyItem, integer) -> {
-                    Toast.makeText(getContext(), "Item clicked : " + integer, Toast.LENGTH_SHORT).show();
+                    if (getActivity() != null && getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).openFragment(RunDetailFragment.newInstance(historyItem.getRun()));
+                    }
                     return true;
                 });
 

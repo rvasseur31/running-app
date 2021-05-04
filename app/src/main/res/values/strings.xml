@@ -39,4 +39,8 @@
     <string name="run_deleted">Run deleted</string>
     <string name="undo">Undo</string>
     <string name="error_run_deleted">Error while we delete the run</string>
+    <string name="max_altitude">Max altitude</string>
+    <string name="value_max_altitude">%s m</string>
+    <string name="max_speed">Max speed</string>
+    <string name="value_max_speed">%s km/h</string>
 </resources>

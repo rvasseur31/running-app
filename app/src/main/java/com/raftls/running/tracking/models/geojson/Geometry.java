@@ -110,19 +110,37 @@ public class Geometry {
         double elevationGain = -0;
         List<Double> lastPoint = null;
         for (List<Double> point : coordinates) {
-            if (lastPoint == null) {
-                break;
-            }
-            try {
-                double elevation = lastPoint.get(ALTITUDE) - point.get(ALTITUDE);
-                if (elevation < 0) {
-                    elevationGain += elevation;
+            if (lastPoint != null) {
+                try {
+                    double elevation = lastPoint.get(ALTITUDE) - point.get(ALTITUDE);
+                    if (elevation < 0) {
+                        elevationGain += elevation;
+                    }
+
+                } catch (Exception exception) {
+                    Log.e("", "No altitude");
                 }
-                lastPoint = point;
+            }
+            lastPoint = point;
+        }
+        if (elevationGain == -0) {
+            return 0;
+        }
+        return -elevationGain;
+    }
+
+    public double getMaxAltitude() {
+        double maxAltitude = 0;
+        for (List<Double> point : coordinates) {
+            try {
+                double nextAltitude = point.get(ALTITUDE);
+                if (nextAltitude > maxAltitude) {
+                    maxAltitude = nextAltitude;
+                }
             } catch (Exception exception) {
                 Log.e("", "No altitude");
             }
         }
-        return -elevationGain;
+        return maxAltitude;
     }
 }
