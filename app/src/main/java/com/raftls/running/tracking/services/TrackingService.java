@@ -162,13 +162,13 @@ public class TrackingService {
         return chronometer;
     }
 
-    public long getDuration() {
-        return chronometer.getChronometerTime() - chronometer.getPauseBaseTime();
+    public float getDuration() {
+        long durationInMills = chronometer.getChronometerTime() - chronometer.getPauseBaseTime();
+        return getMillisToSeconds(durationInMills);
     }
 
     public float getAverageSpeed() {
-        float seconds = getMillisToSeconds(getDuration());
-        return (distance / seconds) * 3.6f;
+        return (distance / getDuration()) * 3.6f;
     }
 
     private float getMillisToSeconds(long millis) {

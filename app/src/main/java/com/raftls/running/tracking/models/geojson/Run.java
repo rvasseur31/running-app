@@ -20,7 +20,7 @@ public class Run {
 
     @SerializedName("duration")
     @Expose
-    private long duration;
+    private float duration;
 
     @SerializedName("distance")
     @Expose
@@ -34,7 +34,7 @@ public class Run {
     @Expose
     private AppFeatureCollection run;
 
-    public Run(float averageSpeed, Date startingTime, long duration, float distance, AppFeatureCollection run) {
+    public Run(float averageSpeed, Date startingTime, float duration, float distance, AppFeatureCollection run) {
         this.maxSpeed = 23.5f;
         this.averageSpeed = averageSpeed;
         this.startingTime = startingTime;
@@ -63,11 +63,11 @@ public class Run {
         this.averageSpeed = averageSpeed;
     }
 
-    public long getDuration() {
+    public float getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(float duration) {
         this.duration = duration;
     }
 
