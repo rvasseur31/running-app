@@ -33,4 +33,7 @@ public interface ApiInterface {
 
     @DELETE("courses/{id}")
     Call<Void> deleteRun(@Path("id") String id);
+
+    @POST("courses/multiple")
+    Call<Void> deleteMultipleRuns(@Body ArrayList<String> ids);
 }

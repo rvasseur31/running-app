@@ -2,19 +2,22 @@ package com.raftls.running.app.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.raftls.running.R;
 import com.raftls.running.databinding.ActivityMainBinding;
+import com.raftls.running.history.events.HistoryRefresh;
 import com.raftls.running.history.ui.HistoryFragment;
+import com.raftls.running.tracking.intents.ActivityTrackingResult;
 import com.raftls.running.tracking.ui.TrackingActivity;
 
-public class MainActivity extends AppCompatActivity  {
+import org.greenrobot.eventbus.EventBus;
+
+public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private final HistoryFragment historyFragment = new HistoryFragment();
@@ -30,8 +33,7 @@ public class MainActivity extends AppCompatActivity  {
                 openFragment(historyFragment);
                 return true;
             } else if (R.id.home_record == item.getItemId()) {
-                Intent intent = new Intent(getApplicationContext(), TrackingActivity.class);
-                startActivity(intent);
+                trackingActivity.launch(null);
                 return true;
             }
             return false;
@@ -44,4 +46,12 @@ public class MainActivity extends AppCompatActivity  {
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+    ActivityResultLauncher<Void> trackingActivity = registerForActivityResult(new ActivityTrackingResult(),
+            result -> {
+                if (result) {
+                    binding.bottomNavigation.setSelectedItemId(R.id.home_history);
+                    EventBus.getDefault().post(new HistoryRefresh());
+                }
+            });
 }
