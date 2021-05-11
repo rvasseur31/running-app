@@ -84,4 +84,27 @@ public class HistoryService {
             }
         });
     }
+
+    public void removeMultipleRuns(ArrayList<String> ids, ApiResponse<Void> callback) {
+        ApiClient.getApi().deleteMultipleRuns(ids).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    callback.success(null);
+                } else {
+                    if (response.errorBody() != null) {
+                        ResponseError responseError = new Gson().fromJson(response.errorBody().charStream(), ResponseError.class);
+                        callback.failure(responseError);
+                    } else {
+                        callback.failure(null);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+
+            }
+        });
+    }
 }

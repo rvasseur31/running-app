@@ -76,19 +76,23 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
                 @Override
                 public void onDismissed(Snackbar snackbar, int event) {
                     if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                        for (DeletedElement deletedElement : recentlyRemoveElement) {
-                            historyService.removeRun(deletedElement.getItem().getRun().getId(), new ApiResponse<Void>() {
-                                @Override
-                                public void success(Void response) {
-                                    recentlyRemoveElement.remove(deletedElement);
-                                }
-
-                                @Override
-                                public void failure(ResponseError response) {
-                                    Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                        ArrayList<String> runsToDelete = new ArrayList<>();
+                        for (int index = recentlyRemoveElement.size() - 1; index >= 0; index--) {
+                            DeletedElement deletedElement = recentlyRemoveElement.get(index);
+                            runsToDelete.add(deletedElement.getItem().getRun().getId());
                         }
+                        recentlyRemoveElement.clear();
+                        historyService.removeMultipleRuns(runsToDelete, new ApiResponse<Void>() {
+                            @Override
+                            public void success(Void response) {
+
+                            }
+
+                            @Override
+                            public void failure(ResponseError response) {
+                                Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 }
 
