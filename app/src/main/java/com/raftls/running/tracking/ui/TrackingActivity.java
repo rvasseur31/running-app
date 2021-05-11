@@ -72,6 +72,7 @@ public class TrackingActivity extends AppCompatActivity implements PermissionsLi
 
         binding.stopTracking.setOnClickListener(view -> {
             Run run = trackingService.getCurrentRun();
+            trackingService.pauseTracking();
             exitDialog = new MaterialDialog.Builder(this)
                     .setTitle(getString(R.string.stop_tracking_alert_title))
                     .setMessage(getString(R.string.stop_tracking_alert_description))
@@ -111,8 +112,10 @@ public class TrackingActivity extends AppCompatActivity implements PermissionsLi
                             }
                         });
                     })
-                    .setNegativeButton(getString(R.string.stop_tracking_alert_cancel), R.drawable.ic_close, (dialogInterface, which) ->
-                            dialogInterface.dismiss())
+                    .setNegativeButton(getString(R.string.stop_tracking_alert_cancel), R.drawable.ic_close, (dialogInterface, which) -> {
+                        dialogInterface.dismiss();
+                        trackingService.startTracking(this, mapFragment.getMapboxMap());
+                    })
                     .build();
             exitDialog.show();
         });
