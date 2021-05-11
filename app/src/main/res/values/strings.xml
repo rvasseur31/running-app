@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">running</string>
+    <string name="app_name">Running</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
     <string name="login_no_account"><u>Don\'t have an account ? Sign up now</u></string>
@@ -29,13 +29,11 @@
     <string name="loading">Loading</string>
     <string name="saving_run_notification_title">Run uploaded</string>
     <string name="saving_run_notification_description">You can now watch your run summary</string>
+    <string name="saving_run_notification_description_data">You ran for %s at a speed of %f km/h</string>
     <string name="saving_run_channel_id">Upload run</string>
     <string name="saving_run_channel_title">@string/saving_run_channel_id</string>
     <string name="saving_run_channel_description">@string/saving_run_channel_id</string>
     <string name="elevation_gain">Elevation gain</string>
-    <string name="hour">h</string>
-    <string name="minut">m</string>
-    <string name="second">s</string>
     <string name="run_deleted">Run deleted</string>
     <string name="undo">Undo</string>
     <string name="error_run_deleted">Error while we delete the run</string>

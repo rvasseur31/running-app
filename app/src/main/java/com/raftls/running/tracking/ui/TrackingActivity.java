@@ -16,12 +16,14 @@ import androidx.fragment.app.Fragment;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.raftls.running.R;
+import com.raftls.running.app.utils.DateUtils;
 import com.raftls.running.databinding.ActivityTrackingBinding;
 import com.raftls.running.network.ApiClient;
 import com.raftls.running.notification.models.ENotificationType;
 import com.raftls.running.notification.services.NotificationService;
 import com.raftls.running.tracking.events.LocationPermissionGrantedEvent;
 import com.raftls.running.tracking.models.ETrackingState;
+import com.raftls.running.tracking.models.geojson.Run;
 import com.raftls.running.tracking.services.TrackingService;
 
 import org.greenrobot.eventbus.EventBus;
@@ -69,6 +71,7 @@ public class TrackingActivity extends AppCompatActivity implements PermissionsLi
         });
 
         binding.stopTracking.setOnClickListener(view -> {
+            Run run = trackingService.getCurrentRun();
             exitDialog = new MaterialDialog.Builder(this)
                     .setTitle(getString(R.string.stop_tracking_alert_title))
                     .setMessage(getString(R.string.stop_tracking_alert_description))
@@ -81,12 +84,13 @@ public class TrackingActivity extends AppCompatActivity implements PermissionsLi
                                 .setCancelable(false)
                                 .build();
                         exitDialog.show();
-                        ApiClient.getApi().uploadRun(trackingService.getCurrentRun()).enqueue(new Callback<Void>() {
+                        ApiClient.getApi().uploadRun(run).enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                                 // Run deleted
                                 exitDialog.dismiss();
-                                NotificationService.getInstance().createNotification(getApplicationContext(), ENotificationType.SAVING_RUN);
+                                String notificationRunData = getString(R.string.saving_run_notification_description_data, DateUtils.getDurationToFullString(TrackingActivity.this, run.getDuration()), run.getAverageSpeed());
+                                NotificationService.getInstance().createNotificationWithCustomBody(getApplicationContext(), ENotificationType.SAVING_RUN, notificationRunData);
                                 exitDialog = new MaterialDialog.Builder(TrackingActivity.this)
                                         .setAnimation(R.raw.success)
                                         .setTitle(getString(R.string.saving_run_notification_title))
@@ -94,6 +98,7 @@ public class TrackingActivity extends AppCompatActivity implements PermissionsLi
                                         .setCancelable(false)
                                         .setPositiveButton(getString(android.R.string.ok), (dialogInterface, which) -> {
                                             exitDialog.dismiss();
+                                            trackingService.resetTracking();
                                             finish();
                                         })
                                         .build();
