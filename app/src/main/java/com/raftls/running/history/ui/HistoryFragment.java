@@ -24,22 +24,24 @@ import com.raftls.running.app.models.ApiResponse;
 import com.raftls.running.app.models.ResponseError;
 import com.raftls.running.databinding.FragmentHistoryBinding;
 import com.raftls.running.history.adapters.HistoryItem;
+import com.raftls.running.history.events.HistoryRefresh;
 import com.raftls.running.history.models.DeletedElement;
 import com.raftls.running.history.services.HistoryService;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class HistoryFragment extends Fragment implements SimpleSwipeCallback.ItemSwipeCallback {
 
-    private final static String TAG = HistoryFragment.class.getSimpleName();
     private FragmentHistoryBinding binding;
     private ItemAdapter<HistoryItem> runs;
     private FastAdapter<HistoryItem> adapter;
     private Snackbar undoDelete;
-    private final Set<DeletedElement> recentlyRemoveElement = new HashSet<>();
+    private final ArrayList<DeletedElement> recentlyRemoveElement = new ArrayList<>();
 
     private final HistoryService historyService = HistoryService.getInstance();
 
@@ -56,12 +58,87 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentHistoryBinding.inflate(inflater, container, false);
-        getRuns();
-        binding.swipeToRefreshHistory.setOnRefreshListener(this::getRuns);
+        onHistoryRefresh(null);
+        binding.swipeToRefreshHistory.setOnRefreshListener(() -> onHistoryRefresh(null));
         return binding.getRoot();
     }
 
-    private void getRuns() {
+    private void showUndoSnackbar() {
+        if (getActivity() != null) {
+            View view = getActivity().findViewById(R.id.main_fragment);
+            if (undoDelete != null && undoDelete.isShown()) {
+                undoDelete.dismiss();
+            }
+            undoDelete = Snackbar.make(view, R.string.run_deleted,
+                    Snackbar.LENGTH_LONG);
+            undoDelete.setAction(R.string.undo, v -> undoDelete());
+            undoDelete.addCallback(new Snackbar.Callback() {
+                @Override
+                public void onDismissed(Snackbar snackbar, int event) {
+                    if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                        for (DeletedElement deletedElement : recentlyRemoveElement) {
+                            historyService.removeRun(deletedElement.getItem().getRun().getId(), new ApiResponse<Void>() {
+                                @Override
+                                public void success(Void response) {
+                                    recentlyRemoveElement.remove(deletedElement);
+                                }
+
+                                @Override
+                                public void failure(ResponseError response) {
+                                    Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
+
+                @Override
+                public void onShown(Snackbar snackbar) {
+
+                }
+            });
+            undoDelete.show();
+        }
+    }
+
+    private void undoDelete() {
+        for (int index = recentlyRemoveElement.size() - 1; index >= 0; index--) {
+            DeletedElement deletedElement = recentlyRemoveElement.get(index);
+            runs.add(deletedElement.getItemPosition(),
+                    deletedElement.getItem());
+            recentlyRemoveElement.remove(index);
+        }
+        adapter.notifyAdapterDataSetChanged();
+    }
+
+    @Override
+    public void itemSwiped(int position, int direction) {
+        HistoryItem item = adapter.getItem(position);
+        if (item == null) {
+            return;
+        } else {
+            recentlyRemoveElement.add(new DeletedElement(item, position));
+        }
+        runs.remove(position);
+        adapter.notifyAdapterDataSetChanged();
+        showUndoSnackbar();
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHistoryRefresh(HistoryRefresh event) {
         historyService.getAllRuns(getContext(), new ApiResponse<ItemAdapter<HistoryItem>>() {
             @Override
             public void success(ItemAdapter<HistoryItem> response) {
@@ -100,62 +177,5 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
 
             }
         });
-    }
-
-    private void showUndoSnackbar() {
-        if (getActivity() != null) {
-            View view = getActivity().findViewById(R.id.main_fragment);
-            undoDelete = Snackbar.make(view, R.string.run_deleted,
-                    Snackbar.LENGTH_LONG);
-            undoDelete.setAction(R.string.undo, v -> undoDelete());
-            undoDelete.addCallback(new Snackbar.Callback() {
-                @Override
-                public void onDismissed(Snackbar snackbar, int event) {
-                    if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                        for (DeletedElement deletedElement : recentlyRemoveElement) {
-                            historyService.removeRun(deletedElement.getItem().getRun().getId(), new ApiResponse<Void>() {
-                                @Override
-                                public void success(Void response) {
-                                    recentlyRemoveElement.remove(deletedElement);
-                                }
-
-                                @Override
-                                public void failure(ResponseError response) {
-                                    Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }
-
-                @Override
-                public void onShown(Snackbar snackbar) {
-
-                }
-            });
-            undoDelete.show();
-        }
-    }
-
-    private void undoDelete() {
-        for (DeletedElement deletedElement : recentlyRemoveElement) {
-            runs.add(deletedElement.getItemPosition(),
-                    deletedElement.getItem());
-            adapter.notifyItemInserted(deletedElement.getItemPosition());
-        }
-        recentlyRemoveElement.clear();
-    }
-
-    @Override
-    public void itemSwiped(int position, int direction) {
-        HistoryItem item = adapter.getItem(position);
-        if (item == null) {
-            return;
-        } else {
-            recentlyRemoveElement.add(new DeletedElement(item, position));
-        }
-        runs.remove(position);
-        adapter.notifyItemRemoved(position);
-        showUndoSnackbar();
     }
 }
