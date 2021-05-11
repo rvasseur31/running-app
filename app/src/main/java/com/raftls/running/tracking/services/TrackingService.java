@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Looper;
-import android.os.SystemClock;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
@@ -84,6 +83,7 @@ public class TrackingService {
         trackingState = ETrackingState.STOPPED;
         chronometer.stop();
         createRun();
+        stopLocationTracking();
     }
 
     public boolean startLocationTracking(Context context, @Nullable MapboxMap mapboxMap) {
@@ -95,6 +95,7 @@ public class TrackingService {
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            resetTracking();
             return false;
         }
 
@@ -117,8 +118,8 @@ public class TrackingService {
                 }
 
                 addPosition(location.getLongitude(), location.getLatitude(), location.getAltitude());
-                if (mapboxMap != null && result.getLastLocation() != null) {
-                    mapboxMap.getLocationComponent().forceLocationUpdate(result.getLastLocation());
+                if (mapboxMap != null) {
+                    mapboxMap.getLocationComponent().forceLocationUpdate(location);
                     MapUtils.drawLines(mapboxMap, currentRun);
                 }
             }
@@ -135,7 +136,7 @@ public class TrackingService {
     }
 
     public void stopLocationTracking() {
-        if (locationEngine != null) {
+        if (locationEngine != null && locationEngineCallback != null) {
             locationEngine.removeLocationUpdates(locationEngineCallback);
         }
     }

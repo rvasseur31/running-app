@@ -43,4 +43,9 @@
     <string name="value_max_altitude">%s m</string>
     <string name="max_speed">Max speed</string>
     <string name="value_max_speed">%s km/h</string>
+    <string name="user_location_permission_not_granted">You must accept location permission to track your run</string>
+    <string name="exit">Exit</string>
+    <string name="open_settings">Open settings</string>
+    <string name="user_location_permission_not_granted_title">Location permission disabled</string>
+    <string name="user_location_permission_not_granted_description">To record your run, we need to access to your location, if you didn\'t accept permission, you will not be able to access to this feature.</string>
 </resources>
