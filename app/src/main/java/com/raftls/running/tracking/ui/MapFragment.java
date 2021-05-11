@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.location.LocationComponent;
@@ -20,15 +19,16 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.raftls.running.R;
 import com.raftls.running.databinding.FragmentMapBinding;
+import com.raftls.running.tracking.events.LocationPermissionGrantedEvent;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-public class MapFragment extends Fragment implements OnMapReadyCallback, PermissionsListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private MapboxMap mapboxMap;
-    private PermissionsManager permissionsManager;
     private FragmentMapBinding binding;
 
     public MapFragment() {
@@ -43,7 +43,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Mapbox.getInstance(getContext(), getString(R.string.mapbox_access_token));
+        Mapbox.getInstance(inflater.getContext(), getString(R.string.mapbox_access_token));
         binding = FragmentMapBinding.inflate(inflater, container, false);
         binding.mapView.onCreate(savedInstanceState);
         binding.mapView.getMapAsync(this);
@@ -53,15 +53,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
-        mapboxMap.setStyle(Style.MAPBOX_STREETS,
-                this::enableLocationComponent);
+        enableLocation();
     }
 
     @SuppressWarnings({"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
-        if (PermissionsManager.areLocationPermissionsGranted(getContext())) {
-
-
+        if (getContext() != null && PermissionsManager.areLocationPermissionsGranted(getContext())) {
             LocationComponentActivationOptions locationComponentActivationOptions = LocationComponentActivationOptions
                     .builder(getContext(), loadedMapStyle)
                     .useDefaultLocationEngine(true)
@@ -71,9 +68,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             locationComponent.setLocationComponentEnabled(true);
             locationComponent.setCameraMode(CameraMode.TRACKING);
             locationComponent.setRenderMode(RenderMode.COMPASS);
-        } else {
-            permissionsManager = new PermissionsManager(this);
-            permissionsManager.requestLocationPermissions(getActivity());
         }
     }
 
@@ -88,6 +82,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     public void onStart() {
         super.onStart();
         binding.mapView.onStart();
+        EventBus.getDefault().register(this);
+        if (getContext() != null && PermissionsManager.areLocationPermissionsGranted(getContext())) {
+            enableLocation();
+        }
     }
 
     @Override
@@ -106,6 +104,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     public void onStop() {
         super.onStop();
         binding.mapView.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -126,13 +125,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         binding.mapView.onLowMemory();
     }
 
-    @Override
-    public void onExplanationNeeded(List<String> permissionsToExplain) {
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLocationPermissionGranted(LocationPermissionGrantedEvent event) {
+        enableLocation();
     }
 
-    @Override
-    public void onPermissionResult(boolean granted) {
-
+    private void enableLocation() {
+        if (mapboxMap != null) {
+            mapboxMap.setStyle(Style.MAPBOX_STREETS,
+                    this::enableLocationComponent);
+        }
     }
 }

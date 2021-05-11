@@ -37,9 +37,11 @@ public class HistoryService {
             public void onResponse(@NotNull Call<ArrayList<Run>> call, @NotNull Response<ArrayList<Run>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ItemAdapter<HistoryItem> list = new ItemAdapter<>();
-                    for (Run run: response.body()) {
-                        HistoryItem item = new HistoryItem(context, run);
-                        list.add(item);
+                    for (Run run : response.body()) {
+                        if (run != null) {
+                            HistoryItem item = new HistoryItem(context, run);
+                            list.add(item);
+                        }
 
                     }
                     callback.success(list);
