@@ -67,10 +67,13 @@ public class TrackingFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startChronometer(StartTrackingEvent event) {
-        if (trackingService.getChronometer().getPauseBaseTime() == 0L) {
+        if (trackingService.getTimeWhenPause() == 0L) {
             binding.chronometer.setBase(SystemClock.elapsedRealtime() - trackingService.getChronometer().getChronometerTime());
         } else {
             binding.chronometer.setBase(SystemClock.elapsedRealtime() - trackingService.getTimeWhenPause());
+        }
+        if (trackingService.trackingState == ETrackingState.RUNNING) {
+            binding.chronometer.start();
         }
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -78,9 +81,6 @@ public class TrackingFragment extends Fragment {
                 showTrackingData();
             }
         }, 0, 10000);
-        if (trackingService.trackingState == ETrackingState.RUNNING) {
-            binding.chronometer.start();
-        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
