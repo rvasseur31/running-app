@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Use quote to keep end space -->
+    <plurals name="hour_full">
+        <item quantity="one">"%d hour "</item>
+        <item quantity="other">"%d hours "</item>
+    </plurals>
+    <plurals name="minute_full">
+        <item quantity="one">"%d minute "</item>
+        <item quantity="other">"%d minutes "</item>
+    </plurals>
+    <plurals name="second_full">
+        <item quantity="one">"%d second "</item>
+        <item quantity="other">"%d seconds "</item>
+    </plurals>
+    <plurals name="hour">
+        <item quantity="other">"%d h "</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="other">"%d m "</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="other">"%d s "</item>
+    </plurals>
+</resources>

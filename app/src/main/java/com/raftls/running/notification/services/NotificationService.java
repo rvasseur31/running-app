@@ -15,6 +15,8 @@ import com.raftls.running.app.activities.MainActivity;
 import com.raftls.running.notification.models.ENotificationType;
 import com.raftls.running.notification.models.NotificationContent;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 
 public class NotificationService {
@@ -35,21 +37,40 @@ public class NotificationService {
                 R.string.saving_run_channel_description));
     }
 
-    public void createNotification(Context context, ENotificationType notificationType) {
+    public NotificationCompat.Builder createNotificationBuilder(Context context, @NotNull NotificationContent notificationContent) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-        NotificationContent notificationContent = notifications.get(notificationType);
         createNotificationChannel(context, context.getString(notificationContent.getChannelId()), context.getString(notificationContent.getChannelTitle()), context.getString(notificationContent.getChannelDescription()));
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, context.getString(notificationContent.getChannelId()))
+        return new NotificationCompat.Builder(context, context.getString(notificationContent.getChannelId()))
                 .setSmallIcon(R.mipmap.ic_notification)
                 .setContentTitle(context.getString(notificationContent.getNotificationTitle()))
                 .setContentText(context.getString(notificationContent.getNotificationDescription()))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
-        fireNotification(context, notificationContent.getNotificationId(), builder);
+    }
+
+    public void createNotification(Context context, ENotificationType notificationType) {
+        NotificationContent notificationContent = notifications.get(notificationType);
+        if (notificationContent != null) {
+            NotificationCompat.Builder builder = createNotificationBuilder(context, notificationContent);
+            fireNotification(context, notificationContent.getNotificationId(), builder);
+        }
+    }
+
+    public void createNotificationWithCustomBody(Context context, ENotificationType notificationType, String customText) {
+        NotificationContent notificationContent = notifications.get(notificationType);
+        if (notificationContent != null) {
+            NotificationCompat.Builder builder = createNotificationBuilder(context, notificationContent);
+            builder.setContentText("");
+            builder.setStyle(new NotificationCompat.BigTextStyle()
+                    .bigText(context.getString(notificationContent.getNotificationDescription()) + "\n" +
+                            customText)
+            );
+            fireNotification(context, notificationContent.getNotificationId(), builder);
+        }
     }
 
     private void fireNotification(Context context, int notificationId, NotificationCompat.Builder builder) {

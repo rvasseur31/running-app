@@ -1,5 +1,7 @@
 package com.raftls.running.notification.models;
 
+import org.jetbrains.annotations.NotNull;
+
 public class NotificationContent {
     private final int notificationId;
     private final int notificationTitle;
