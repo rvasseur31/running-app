@@ -77,8 +77,11 @@ dependencies {
     // Chronometer
     implementation 'com.github.gbzarelli:chronometer-library:2.0.0'
 
-    // SweetDialog
-    implementation 'com.github.f0ris.sweetalert:library:1.6.2'
+    // MaterialDialog
+    implementation 'dev.shreyaspatil.MaterialDialog:MaterialDialog:2.2.2'
+
+    // Lottie for Animation
+    implementation 'com.airbnb.android:lottie:3.7.0'
 
     // Fast Adapter
     implementation "com.mikepenz:fastadapter:5.4.1"

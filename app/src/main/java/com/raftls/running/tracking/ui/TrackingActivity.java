@@ -18,7 +18,7 @@ import com.raftls.running.tracking.services.TrackingService;
 
 import org.jetbrains.annotations.NotNull;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
+import dev.shreyaspatil.MaterialDialog.MaterialDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,8 +29,8 @@ public class TrackingActivity extends AppCompatActivity {
     private boolean isMapViewSelected = true;
     private ActivityTrackingBinding binding;
     private final TrackingService trackingService = TrackingService.getInstance();
-    private SweetAlertDialog exitAlert;
     private final MapFragment mapFragment = new MapFragment();
+    private MaterialDialog exitDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,20 +55,35 @@ public class TrackingActivity extends AppCompatActivity {
         });
 
         binding.stopTracking.setOnClickListener(view -> {
-            exitAlert = new SweetAlertDialog(TrackingActivity.this, SweetAlertDialog.WARNING_TYPE)
-                    .setTitleText(getString(R.string.stop_tracking_alert_title))
-                    .setContentText(getString(R.string.stop_tracking_alert_description))
-                    .setCancelText(getString(R.string.stop_tracking_alert_cancel))
-                    .setConfirmText(getString(R.string.stop_tracking_alert_confirm))
-                    .setConfirmClickListener(dialog -> {
+            exitDialog = new MaterialDialog.Builder(this)
+                    .setTitle(getString(R.string.stop_tracking_alert_title))
+                    .setMessage(getString(R.string.stop_tracking_alert_description))
+                    .setCancelable(false)
+                    .setPositiveButton(getString(R.string.stop_tracking_alert_confirm), R.drawable.ic_delete, (dialogInterface, which) -> {
+                        exitDialog.dismiss();
+                        exitDialog = new MaterialDialog.Builder(this)
+                                .setAnimation(R.raw.loading)
+                                .setTitle(getString(R.string.loading))
+                                .setCancelable(false)
+                                .build();
+                        exitDialog.show();
                         ApiClient.getApi().uploadRun(trackingService.getCurrentRun()).enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                                Log.d(TAG, "Success");
-                                exitAlert.dismissWithAnimation();
-                                exitAlert = new SweetAlertDialog(TrackingActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                        .setTitleText(getString(R.string.loading));
-                                exitAlert.show();
+                                // Run deleted
+                                exitDialog.dismiss();
+                                NotificationService.getInstance().createNotification(getApplicationContext(), ENotificationType.SAVING_RUN);
+                                exitDialog = new MaterialDialog.Builder(TrackingActivity.this)
+                                        .setAnimation(R.raw.success)
+                                        .setTitle(getString(R.string.saving_run_notification_title))
+                                        .setMessage(getString(R.string.saving_run_notification_description))
+                                        .setCancelable(false)
+                                        .setPositiveButton(getString(android.R.string.ok), (dialogInterface, which) -> {
+                                            exitDialog.dismiss();
+                                            finish();
+                                        })
+                                        .build();
+                                exitDialog.show();
                             }
 
                             @Override
@@ -76,15 +91,11 @@ public class TrackingActivity extends AppCompatActivity {
                                 Log.d(TAG, "Error");
                             }
                         });
-                        NotificationService.getInstance().createNotification(getApplicationContext(), ENotificationType.SAVING_RUN);
-                        exitAlert.dismissWithAnimation();
-                        exitAlert = new SweetAlertDialog(TrackingActivity.this, SweetAlertDialog.PROGRESS_TYPE)
-                                .setTitleText(getString(R.string.loading));
-                        exitAlert.show();
-
                     })
-                    .setCancelClickListener(SweetAlertDialog::cancel);
-            exitAlert.show();
+                    .setNegativeButton(getString(R.string.stop_tracking_alert_cancel), R.drawable.ic_close, (dialogInterface, which) ->
+                            dialogInterface.dismiss())
+                    .build();
+            exitDialog.show();
         });
 
         binding.mapViewButton.setOnClickListener(view -> {
@@ -116,13 +127,5 @@ public class TrackingActivity extends AppCompatActivity {
                 .add(R.id.trackingFragment, new TrackingFragment())
                 .addToBackStack("tracking")
                 .commit();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (isMapViewSelected) {
-
-        }
     }
 }
