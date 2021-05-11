@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">running</string>
+    <string name="app_name">Running</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
     <string name="login_no_account"><u>Don\'t have an account ? Sign up now</u></string>

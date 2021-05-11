@@ -43,7 +43,7 @@ public class NotificationService {
         NotificationContent notificationContent = notifications.get(notificationType);
         createNotificationChannel(context, context.getString(notificationContent.getChannelId()), context.getString(notificationContent.getChannelTitle()), context.getString(notificationContent.getChannelDescription()));
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, context.getString(notificationContent.getChannelId()))
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.mipmap.ic_notification)
                 .setContentTitle(context.getString(notificationContent.getNotificationTitle()))
                 .setContentText(context.getString(notificationContent.getNotificationDescription()))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
