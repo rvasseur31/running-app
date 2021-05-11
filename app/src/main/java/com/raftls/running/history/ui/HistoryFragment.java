@@ -29,12 +29,17 @@ import com.raftls.running.history.services.HistoryService;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class HistoryFragment extends Fragment implements SimpleSwipeCallback.ItemSwipeCallback {
 
+    private final static String TAG = HistoryFragment.class.getSimpleName();
     private FragmentHistoryBinding binding;
     private ItemAdapter<HistoryItem> runs;
     private FastAdapter<HistoryItem> adapter;
-    private DeletedElement recentlyRemoveElement;
+    private Snackbar undoDelete;
+    private final Set<DeletedElement> recentlyRemoveElement = new HashSet<>();
 
     private final HistoryService historyService = HistoryService.getInstance();
 
@@ -51,9 +56,16 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentHistoryBinding.inflate(inflater, container, false);
+        getRuns();
+        binding.swipeToRefreshHistory.setOnRefreshListener(this::getRuns);
+        return binding.getRoot();
+    }
+
+    private void getRuns() {
         historyService.getAllRuns(getContext(), new ApiResponse<ItemAdapter<HistoryItem>>() {
             @Override
             public void success(ItemAdapter<HistoryItem> response) {
+                binding.swipeToRefreshHistory.setRefreshing(false);
                 runs = response;
                 adapter = FastAdapter.with(response);
                 binding.history.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -68,7 +80,7 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
                     return true;
                 });
 
-                Drawable trash = ContextCompat.getDrawable(container.getContext(), R.drawable.ic_delete);
+                Drawable trash = ContextCompat.getDrawable(getContext(), R.drawable.ic_delete);
                 SimpleSwipeCallback touchCallback = new SimpleSwipeCallback(
                         HistoryFragment.this,
                         trash,
@@ -88,31 +100,31 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
 
             }
         });
-        return binding.getRoot();
     }
 
     private void showUndoSnackbar() {
         if (getActivity() != null) {
             View view = getActivity().findViewById(R.id.main_fragment);
-            Snackbar snackbar = Snackbar.make(view, R.string.run_deleted,
+            undoDelete = Snackbar.make(view, R.string.run_deleted,
                     Snackbar.LENGTH_LONG);
-            snackbar.setAction(R.string.undo, v -> undoDelete());
-            snackbar.addCallback(new Snackbar.Callback() {
+            undoDelete.setAction(R.string.undo, v -> undoDelete());
+            undoDelete.addCallback(new Snackbar.Callback() {
                 @Override
                 public void onDismissed(Snackbar snackbar, int event) {
                     if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                        historyService.removeRun(recentlyRemoveElement.getItem().getRun().getId(),
-                                new ApiResponse<Void>() {
-                                    @Override
-                                    public void success(Void response) {
-                                        recentlyRemoveElement = null;
-                                    }
+                        for (DeletedElement deletedElement : recentlyRemoveElement) {
+                            historyService.removeRun(deletedElement.getItem().getRun().getId(), new ApiResponse<Void>() {
+                                @Override
+                                public void success(Void response) {
+                                    recentlyRemoveElement.remove(deletedElement);
+                                }
 
-                                    @Override
-                                    public void failure(ResponseError response) {
-                                        Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                @Override
+                                public void failure(ResponseError response) {
+                                    Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 }
 
@@ -121,14 +133,17 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
 
                 }
             });
-            snackbar.show();
+            undoDelete.show();
         }
     }
 
     private void undoDelete() {
-        runs.add(recentlyRemoveElement.getItemPosition(),
-                recentlyRemoveElement.getItem());
-        adapter.notifyItemInserted(recentlyRemoveElement.getItemPosition());
+        for (DeletedElement deletedElement : recentlyRemoveElement) {
+            runs.add(deletedElement.getItemPosition(),
+                    deletedElement.getItem());
+            adapter.notifyItemInserted(deletedElement.getItemPosition());
+        }
+        recentlyRemoveElement.clear();
     }
 
     @Override
@@ -137,7 +152,7 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
         if (item == null) {
             return;
         } else {
-            recentlyRemoveElement = new DeletedElement(item, position);
+            recentlyRemoveElement.add(new DeletedElement(item, position));
         }
         runs.remove(position);
         adapter.notifyItemRemoved(position);
