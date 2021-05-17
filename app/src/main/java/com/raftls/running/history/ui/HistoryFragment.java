@@ -146,6 +146,7 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
         historyService.getAllRuns(getContext(), new ApiResponse<ItemAdapter<HistoryItem>>() {
             @Override
             public void success(ItemAdapter<HistoryItem> response) {
+                binding.history.setVisibility(View.VISIBLE);
                 binding.swipeToRefreshHistory.setRefreshing(false);
                 runs = response;
                 adapter = FastAdapter.with(response);
@@ -178,7 +179,13 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
 
             @Override
             public void failure(ResponseError response) {
-
+                binding.clNoResult.setVisibility(View.VISIBLE);
+                binding.noResultLottieAnimation.playAnimation();
+                binding.btnStartRunning.setOnClickListener(view -> {
+                    if (getActivity() != null && getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).trackingActivity.launch(null);
+                    }
+                });
             }
         });
     }
