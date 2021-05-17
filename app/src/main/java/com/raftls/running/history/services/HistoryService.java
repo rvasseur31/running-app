@@ -36,6 +36,9 @@ public class HistoryService {
             @Override
             public void onResponse(@NotNull Call<ArrayList<Run>> call, @NotNull Response<ArrayList<Run>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    if (response.body().isEmpty()) {
+                        callback.failure(null);
+                    }
                     ItemAdapter<HistoryItem> list = new ItemAdapter<>();
                     for (Run run : response.body()) {
                         if (run != null) {

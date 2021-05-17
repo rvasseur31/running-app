@@ -19,6 +19,7 @@ import com.mikepenz.fastadapter.binding.BindingViewHolder;
 import com.mikepenz.fastadapter.swipe.ISwipeable;
 import com.raftls.running.R;
 import com.raftls.running.app.utils.DateUtils;
+import com.raftls.running.app.utils.Utils;
 import com.raftls.running.databinding.ItemHistoryBinding;
 import com.raftls.running.map.MapUtils;
 import com.raftls.running.tracking.models.geojson.Run;
@@ -63,9 +64,9 @@ public class HistoryItem extends AbstractBindingItem<ItemHistoryBinding> impleme
         super.bindView(holder, payloads);
         holder.getBinding().tvTitle.setText("My run");
         holder.getBinding().tvDate.setText(run.getStartingTime().toString());
-        holder.getBinding().tvDistance.setText(context.getString(R.string.n_km, String.valueOf(run.getDistance() / 1000)));
+        holder.getBinding().tvDistance.setText(context.getString(R.string.n_km, String.valueOf(Utils.round(run.getDistance() / 1000, 1))));
         holder.getBinding().tvElevationGain.setText(context.getString(R.string.value_elevation_gain,
-                String.valueOf(run.getRun().getFeatures().get(0).getGeometry().getElevationGain())));
+                String.valueOf(Utils.round(run.getRun().getFeatures().get(0).getGeometry().getElevationGain(), 1))));
         holder.getBinding().tvTime.setText(DateUtils.getDurationToString(context, run.getDuration()));
         holder.getBinding().mapView.onCreate(null);
         holder.getBinding().mapView.getMapAsync(this);

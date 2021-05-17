@@ -1,23 +1,26 @@
 package com.raftls.running.app.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.PopupMenu;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.MenuRes;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.raftls.running.R;
+import com.raftls.running.authentification.activities.BaseAuthenticationActivity;
+import com.raftls.running.authentification.events.AuthenticationEvent;
 import com.raftls.running.databinding.ActivityMainBinding;
 import com.raftls.running.history.events.HistoryRefresh;
 import com.raftls.running.history.ui.HistoryFragment;
 import com.raftls.running.tracking.intents.ActivityTrackingResult;
-import com.raftls.running.tracking.ui.TrackingActivity;
 
 import org.greenrobot.eventbus.EventBus;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseAuthenticationActivity {
 
     private ActivityMainBinding binding;
     private final HistoryFragment historyFragment = new HistoryFragment();
@@ -41,17 +44,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main_fragment, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
-    ActivityResultLauncher<Void> trackingActivity = registerForActivityResult(new ActivityTrackingResult(),
+    public ActivityResultLauncher<Void> trackingActivity = registerForActivityResult(new ActivityTrackingResult(),
             result -> {
                 if (result) {
                     binding.bottomNavigation.setSelectedItemId(R.id.home_history);
                     EventBus.getDefault().post(new HistoryRefresh());
                 }
             });
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(R.id.main_fragment);
+        if (fragment instanceof HistoryFragment) {
+            finish();
+        } else {
+            if (fragmentManager.getBackStackEntryCount() > 0) {
+                fragmentManager.popBackStack();
+            } else {
+                super.onBackPressed();
+            }
+        }
+    }
 }

@@ -46,4 +46,10 @@
     <string name="open_settings">Open settings</string>
     <string name="user_location_permission_not_granted_title">Location permission disabled</string>
     <string name="user_location_permission_not_granted_description">To record your run, we need to access to your location, if you didn\'t accept permission, you will not be able to access to this feature.</string>
+    <string name="no_result_title">No result</string>
+    <string name="no_result_description">Your history is empty, start running, and analyze your results</string>
+    <string name="no_result_action">Start running</string>
+    <string name="logout">Logout</string>
+    <string name="run_detail">Run detail</string>
+    <string name="delete_run">Delete run</string>
 </resources>

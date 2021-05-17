@@ -20,6 +20,7 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback;
 import com.raftls.running.R;
 import com.raftls.running.app.activities.MainActivity;
+import com.raftls.running.app.fragment.BaseToolbarFragment;
 import com.raftls.running.app.models.ApiResponse;
 import com.raftls.running.app.models.ResponseError;
 import com.raftls.running.databinding.FragmentHistoryBinding;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-public class HistoryFragment extends Fragment implements SimpleSwipeCallback.ItemSwipeCallback {
+public class HistoryFragment extends BaseToolbarFragment implements SimpleSwipeCallback.ItemSwipeCallback {
 
     private FragmentHistoryBinding binding;
     private ItemAdapter<HistoryItem> runs;
@@ -60,6 +61,7 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
         binding = FragmentHistoryBinding.inflate(inflater, container, false);
         onHistoryRefresh(null);
         binding.swipeToRefreshHistory.setOnRefreshListener(() -> onHistoryRefresh(null));
+        binding.btnMore.setOnClickListener(view -> showMenu(view, R.menu.logout_menu));
         return binding.getRoot();
     }
 
@@ -76,23 +78,7 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
                 @Override
                 public void onDismissed(Snackbar snackbar, int event) {
                     if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                        ArrayList<String> runsToDelete = new ArrayList<>();
-                        for (int index = recentlyRemoveElement.size() - 1; index >= 0; index--) {
-                            DeletedElement deletedElement = recentlyRemoveElement.get(index);
-                            runsToDelete.add(deletedElement.getItem().getRun().getId());
-                        }
-                        recentlyRemoveElement.clear();
-                        historyService.removeMultipleRuns(runsToDelete, new ApiResponse<Void>() {
-                            @Override
-                            public void success(Void response) {
-
-                            }
-
-                            @Override
-                            public void failure(ResponseError response) {
-                                Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        deleteRuns();
                     }
                 }
 
@@ -106,6 +92,7 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
     }
 
     private void undoDelete() {
+        binding.clNoResult.setVisibility(View.GONE);
         for (int index = recentlyRemoveElement.size() - 1; index >= 0; index--) {
             DeletedElement deletedElement = recentlyRemoveElement.get(index);
             runs.add(deletedElement.getItemPosition(),
@@ -124,6 +111,9 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
             recentlyRemoveElement.add(new DeletedElement(item, position));
         }
         runs.remove(position);
+        if (runs.getAdapterItems().isEmpty()) {
+            showNoResultView();
+        }
         adapter.notifyAdapterDataSetChanged();
         showUndoSnackbar();
 
@@ -138,14 +128,18 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
     @Override
     public void onStop() {
         super.onStop();
+        deleteRuns();
         EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHistoryRefresh(HistoryRefresh event) {
+        binding.clNoResult.setVisibility(View.GONE);
+        binding.history.setVisibility(View.GONE);
         historyService.getAllRuns(getContext(), new ApiResponse<ItemAdapter<HistoryItem>>() {
             @Override
             public void success(ItemAdapter<HistoryItem> response) {
+                binding.history.setVisibility(View.VISIBLE);
                 binding.swipeToRefreshHistory.setRefreshing(false);
                 runs = response;
                 adapter = FastAdapter.with(response);
@@ -178,8 +172,40 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
 
             @Override
             public void failure(ResponseError response) {
-
+                showNoResultView();
             }
         });
+    }
+
+    private void showNoResultView() {
+        binding.clNoResult.setVisibility(View.VISIBLE);
+        binding.noResultLottieAnimation.playAnimation();
+        binding.btnStartRunning.setOnClickListener(view -> {
+            if (getActivity() != null && getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).trackingActivity.launch(null);
+            }
+        });
+    }
+
+    private void deleteRuns() {
+        if (!recentlyRemoveElement.isEmpty()) {
+            ArrayList<String> runsToDelete = new ArrayList<>();
+            for (int index = recentlyRemoveElement.size() - 1; index >= 0; index--) {
+                DeletedElement deletedElement = recentlyRemoveElement.get(index);
+                runsToDelete.add(deletedElement.getItem().getRun().getId());
+            }
+            recentlyRemoveElement.clear();
+            historyService.removeMultipleRuns(runsToDelete, new ApiResponse<Void>() {
+                @Override
+                public void success(Void response) {
+
+                }
+
+                @Override
+                public void failure(ResponseError response) {
+                    Toast.makeText(getContext(), R.string.error_run_deleted, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

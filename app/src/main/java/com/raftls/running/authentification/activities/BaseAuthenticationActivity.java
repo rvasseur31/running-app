@@ -6,10 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.raftls.running.authentification.events.AuthenticationEvent;
 import com.raftls.running.app.activities.MainActivity;
+import com.raftls.running.storage.services.StorageService;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import static com.raftls.running.authentification.services.UserService.AUTH_PREFERENCES;
+import static com.raftls.running.authentification.services.UserService.TOKEN_PREFERENCE;
 
 public class BaseAuthenticationActivity extends AppCompatActivity {
 
@@ -31,6 +35,7 @@ public class BaseAuthenticationActivity extends AppCompatActivity {
         if(event.isAuthenticated()) {
              clazz = MainActivity.class;
         } else {
+            StorageService.getInstance().clearPreference(getApplicationContext(), AUTH_PREFERENCES, TOKEN_PREFERENCE);
             clazz = LoginActivity.class;
         }
         Intent intent = new Intent(getApplicationContext(), clazz);
