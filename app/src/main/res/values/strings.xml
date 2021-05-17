@@ -49,4 +49,5 @@
     <string name="no_result_title">No result</string>
     <string name="no_result_description">Your history is empty, start running, and analyze your results</string>
     <string name="no_result_action">Start running</string>
+    <string name="logout">Logout</string>
 </resources>

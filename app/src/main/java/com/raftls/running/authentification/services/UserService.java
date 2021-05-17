@@ -45,7 +45,6 @@ public class UserService {
                     EventBus.getDefault().post(new AuthenticationEvent(response.body()));
                 } else {
                     EventBus.getDefault().post(new AuthenticationEvent(null));
-                    StorageService.getInstance().clearPreference(context, AUTH_PREFERENCES, TOKEN_PREFERENCE);
                 }
             }
 
