@@ -77,7 +77,7 @@ public class TrackingActivity extends AppCompatActivity implements PermissionsLi
                     .setTitle(getString(R.string.stop_tracking_alert_title))
                     .setMessage(getString(R.string.stop_tracking_alert_description))
                     .setCancelable(false)
-                    .setPositiveButton(getString(R.string.stop_tracking_alert_confirm), R.drawable.ic_delete, (dialogInterface, which) -> {
+                    .setPositiveButton(getString(R.string.stop_tracking_alert_confirm), R.drawable.ic_save, (dialogInterface, which) -> {
                         exitDialog.dismiss();
                         exitDialog = new MaterialDialog.Builder(this)
                                 .setAnimation(R.raw.loading)
