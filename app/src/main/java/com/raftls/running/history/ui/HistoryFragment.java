@@ -20,6 +20,7 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.swipe.SimpleSwipeCallback;
 import com.raftls.running.R;
 import com.raftls.running.app.activities.MainActivity;
+import com.raftls.running.app.fragment.BaseToolbarFragment;
 import com.raftls.running.app.models.ApiResponse;
 import com.raftls.running.app.models.ResponseError;
 import com.raftls.running.databinding.FragmentHistoryBinding;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-public class HistoryFragment extends Fragment implements SimpleSwipeCallback.ItemSwipeCallback {
+public class HistoryFragment extends BaseToolbarFragment implements SimpleSwipeCallback.ItemSwipeCallback {
 
     private FragmentHistoryBinding binding;
     private ItemAdapter<HistoryItem> runs;
@@ -60,6 +61,7 @@ public class HistoryFragment extends Fragment implements SimpleSwipeCallback.Ite
         binding = FragmentHistoryBinding.inflate(inflater, container, false);
         onHistoryRefresh(null);
         binding.swipeToRefreshHistory.setOnRefreshListener(() -> onHistoryRefresh(null));
+        binding.btnMore.setOnClickListener(view -> showMenu(view, R.menu.logout_menu));
         return binding.getRoot();
     }
 
