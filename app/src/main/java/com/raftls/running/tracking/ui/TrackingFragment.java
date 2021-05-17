@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.raftls.running.app.Utils;
+import com.raftls.running.app.utils.Utils;
 import com.raftls.running.databinding.FragmentTrackingBinding;
 import com.raftls.running.tracking.events.StartTrackingEvent;
 import com.raftls.running.tracking.events.PauseTrackingEvent;

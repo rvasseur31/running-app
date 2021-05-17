@@ -3,11 +3,9 @@ package com.raftls.running.app.activities;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.MenuRes;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -43,9 +41,6 @@ public class MainActivity extends BaseAuthenticationActivity {
             }
             return false;
         });
-
-        binding.btnBack.setOnClickListener(view -> onBackPressed());
-        binding.btnMore.setOnClickListener(view -> showMenu(view, R.menu.logout_menu));
     }
 
     public void openFragment(Fragment fragment) {
@@ -64,16 +59,18 @@ public class MainActivity extends BaseAuthenticationActivity {
                 }
             });
 
-    private void showMenu(View view, @MenuRes int menuRes) {
-        PopupMenu popupMenu = new PopupMenu(getApplicationContext(), view);
-        popupMenu.getMenuInflater().inflate(menuRes, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(menuItem -> {
-            if (menuItem.getItemId() == R.id.logout) {
-                EventBus.getDefault().post(new AuthenticationEvent(null));
-                return true;
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(R.id.main_fragment);
+        if (fragment instanceof HistoryFragment) {
+            finish();
+        } else {
+            if (fragmentManager.getBackStackEntryCount() > 0) {
+                fragmentManager.popBackStack();
+            } else {
+                super.onBackPressed();
             }
-            return false;
-        });
-        popupMenu.show();
+        }
     }
 }

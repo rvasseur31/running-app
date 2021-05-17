@@ -1,4 +1,4 @@
-package com.raftls.running.app;
+package com.raftls.running.app.utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
