@@ -13,19 +13,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Running"
         android:usesCleartextTraffic="true"
-        tools:targetApi="m"
-        tools:replace="android:icon">
-        <activity android:name=".tracking.ui.TrackingActivity" />
-        <activity android:name=".app.activities.SplashActivity">
+        tools:replace="android:icon"
+        tools:targetApi="m">
+        <activity
+            android:name=".tracking.ui.TrackingActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".app.activities.SplashActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".authentification.activities.LoginActivity" />
-        <activity android:name=".authentification.activities.RegisterActivity" />
-        <activity android:name=".app.activities.MainActivity" />
+        <activity
+            android:name=".authentification.activities.LoginActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".authentification.activities.RegisterActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".app.activities.MainActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
     </application>
 
 </manifest>
